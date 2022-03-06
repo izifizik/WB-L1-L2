@@ -21,9 +21,10 @@ func NewCache() Cache {
 func (c *cache) Set(uuid int, event model.Event) {
 	m.Lock()
 	events := c.cache[uuid]
-	for _, e := range events {
+	for i, e := range events {
 		if e.ID == event.ID {
 			e = event
+			events[i] = e
 			m.Unlock()
 			return
 		}

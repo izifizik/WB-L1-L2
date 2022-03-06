@@ -13,7 +13,7 @@ type appHandler func(w http.ResponseWriter, r *http.Request) error
 func Log(h appHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var appError *apperror.AppError
-
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		t1 := time.Now()
 		err := h(w, r)
 		t2 := time.Now()
@@ -38,7 +38,7 @@ func Log(h appHandler) http.HandlerFunc {
 			w.WriteHeader(http.StatusServiceUnavailable)
 			w.Write(apperror.NewSystemError(err).Marshal())
 
-			log.Printf("Method: %s, Path: %s%s, Status:%d, %s", r.Method, r.Host, r.RequestURI, http.StatusTeapot, t2.Sub(t1).String())
+			log.Printf("Method: %s, Path: %s%s, Status:%d, %s", r.Method, r.Host, r.RequestURI, http.StatusServiceUnavailable, t2.Sub(t1).String())
 			return
 		}
 		w.WriteHeader(http.StatusOK)

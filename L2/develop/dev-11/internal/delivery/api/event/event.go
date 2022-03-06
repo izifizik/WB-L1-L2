@@ -24,12 +24,7 @@ func NewHandler(service service.Service) api.Handler {
 	return &handler{service: service}
 }
 
-func (h handler) NoRoute(w http.ResponseWriter, r *http.Request) error {
-	return NoRouteError
-}
-
 func (h handler) Register(router *http.ServeMux) {
-	router.HandleFunc("*", Log(h.NoRoute))
 
 	router.HandleFunc("/create_event", Log(h.CreateEvent))
 	router.HandleFunc("/update_event", Log(h.UpdateEvent))
@@ -43,7 +38,7 @@ func (h handler) Register(router *http.ServeMux) {
 
 func (h handler) CreateEvent(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
-	case "POST":
+	case http.MethodPost:
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			return err
@@ -57,8 +52,6 @@ func (h handler) CreateEvent(w http.ResponseWriter, r *http.Request) error {
 
 		event := dto.toEvent()
 		h.service.SetEvent(dto.UserID, event)
-
-		w.WriteHeader(http.StatusOK)
 	default:
 		return MethodNotAllowed
 	}
@@ -67,7 +60,7 @@ func (h handler) CreateEvent(w http.ResponseWriter, r *http.Request) error {
 
 func (h handler) UpdateEvent(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
-	case "POST":
+	case http.MethodPost:
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			return err
@@ -81,8 +74,6 @@ func (h handler) UpdateEvent(w http.ResponseWriter, r *http.Request) error {
 		event := dto.toEvent()
 
 		h.service.SetEvent(dto.UserID, event)
-
-		w.WriteHeader(http.StatusOK)
 	default:
 		return MethodNotAllowed
 	}
@@ -91,22 +82,19 @@ func (h handler) UpdateEvent(w http.ResponseWriter, r *http.Request) error {
 
 func (h handler) DeleteEvent(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
-	case "POST":
+	case http.MethodPost:
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			return err
 		}
 
-		var dto EventDTO
+		var dto DeleteEventDTO
 		err = json.Unmarshal(body, &dto)
 		if err != nil {
 			return err
 		}
-		event := dto.toEvent()
 
-		h.service.SetEvent(dto.UserID, event)
-
-		w.WriteHeader(http.StatusOK)
+		h.service.DeleteEvent(dto.UserID, dto.ID)
 	default:
 		return MethodNotAllowed
 	}
@@ -115,7 +103,7 @@ func (h handler) DeleteEvent(w http.ResponseWriter, r *http.Request) error {
 
 func (h handler) EventsForDay(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
-	case "GET":
+	case http.MethodGet:
 		params := r.URL.Query()
 		date := params.Get("date")
 		uuid := params.Get("user_id")
@@ -128,7 +116,6 @@ func (h handler) EventsForDay(w http.ResponseWriter, r *http.Request) error {
 		events := h.service.GetEvents(n, t, time.Hour*24)
 		data, err := json.Marshal(events)
 		w.Write(data)
-		w.WriteHeader(http.StatusOK)
 	default:
 		return MethodNotAllowed
 	}
@@ -137,7 +124,7 @@ func (h handler) EventsForDay(w http.ResponseWriter, r *http.Request) error {
 
 func (h handler) EventsForWeek(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
-	case "GET":
+	case http.MethodGet:
 		params := r.URL.Query()
 		date := params.Get("date")
 		uuid := params.Get("user_id")
@@ -150,7 +137,6 @@ func (h handler) EventsForWeek(w http.ResponseWriter, r *http.Request) error {
 		events := h.service.GetEvents(n, t, time.Hour*24*7)
 		data, err := json.Marshal(events)
 		w.Write(data)
-		w.WriteHeader(http.StatusOK)
 	default:
 		return MethodNotAllowed
 	}
@@ -159,7 +145,7 @@ func (h handler) EventsForWeek(w http.ResponseWriter, r *http.Request) error {
 
 func (h handler) EventsForMonth(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
-	case "GET":
+	case http.MethodGet:
 		params := r.URL.Query()
 		date := params.Get("date")
 		uuid := params.Get("user_id")
@@ -172,7 +158,6 @@ func (h handler) EventsForMonth(w http.ResponseWriter, r *http.Request) error {
 		events := h.service.GetEvents(n, t, time.Hour*24*30)
 		data, err := json.Marshal(events)
 		w.Write(data)
-		w.WriteHeader(http.StatusOK)
 	default:
 		return MethodNotAllowed
 	}

@@ -18,12 +18,12 @@ func (s service) SetEvent(uuid int, event model.Event) {
 	s.cache.Set(uuid, event)
 }
 
-func (s service) GetEvents(uuid int, time time.Time, duration time.Duration) []model.Event {
+func (s service) GetEvents(uuid int, t time.Time, duration time.Duration) []model.Event {
 	res := make([]model.Event, 0)
 	events := s.cache.Get(uuid)
 
 	for _, event := range events {
-		if event.Time.After(time) && event.Time.Before(time.Add(duration)) {
+		if event.Time.After(t) && event.Time.Before(t.Add(duration)) {
 			res = append(res, event)
 		}
 	}
@@ -35,7 +35,7 @@ func (s service) DeleteEvent(uuid int, eventID int) {
 }
 
 func (s service) IsValid(t string) (time.Time, error) {
-	res, err := time.Parse("2006-02-02", t)
+	res, err := time.Parse("2006-01-02", t)
 	if err != nil {
 		return time.Time{}, err
 	}
