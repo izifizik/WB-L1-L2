@@ -73,4 +73,6 @@ func writeToFile(fileName string, resp *http.Response) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
 }
