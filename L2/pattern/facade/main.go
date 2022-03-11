@@ -1,13 +1,10 @@
 package main
 
 import (
-	"Work/L2/pattern/facade/model"
+	"facade/model"
 	"fmt"
 )
 
-/*
-+: изоляция
-*/
 func main() {
 	tBank := model.Bank{
 		Name:  "T-bank",

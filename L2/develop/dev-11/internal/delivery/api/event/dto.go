@@ -6,11 +6,11 @@ import (
 )
 
 type EventDTO struct {
-	ID          int       `json:"ID"`
-	UserID      int       `json:"user_ID"`
+	Time        time.Time `json:"time"`
 	Title       string    `json:"title,omitempty"`
 	Description string    `json:"description,omitempty"`
-	Time        time.Time `json:"time"`
+	ID          int       `json:"ID"`
+	UserID      int       `json:"user_ID"`
 }
 
 type DeleteEventDTO struct {

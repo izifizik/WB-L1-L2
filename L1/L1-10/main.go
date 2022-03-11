@@ -10,5 +10,7 @@ func main() {
 		gap := (int(c) / 10) * 10
 		m[gap] = append(m[gap], c)
 	}
-	fmt.Println(m)
+	for k, v := range m {
+		fmt.Println(k, v)
+	}
 }

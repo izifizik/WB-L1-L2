@@ -21,8 +21,5 @@ func (u User) Buy(shop Shop, product string) bool {
 
 //payAbility - хватает ли баланса пользователя?
 func (u User) payAbility(price float64) bool {
-	if !u.Card.payAbility(price) {
-		return false
-	}
-	return true
+	return u.Card.payAbility(price)
 }

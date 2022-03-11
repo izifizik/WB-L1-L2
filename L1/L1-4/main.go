@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
-	"time"
+	"sync"
 )
 
 //range for chan will end when chan will close down by someone
@@ -17,32 +18,45 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
 	m := make(chan int)
-	defer close(m)
-
+	wg := &sync.WaitGroup{}
 	for i := 0; i < c; i++ {
-		go worker(m, i)
+		wg.Add(1)
+		go worker(m, wg, i)
 	}
 
-	go job(m)
+	go job(ctx, m)
 
 	sign := make(chan os.Signal, 1)
 	signal.Notify(sign, os.Interrupt)
 	sig := <-sign
 	log.Printf("Caught signal %s. Shutting down...", sig)
+	cancel()
+
+	wg.Wait()
 }
 
-func worker(ch chan int, id int) {
+func worker(ch chan int, wg *sync.WaitGroup, id int) {
 	for n := range ch {
 		fmt.Println(id+1, ":", n)
 	}
+	fmt.Println("worker", id+1, "quit")
+	wg.Done()
 }
 
-func job(ch chan int) {
+func job(ctx context.Context, ch chan int) {
 	i := 1
 	for {
-		ch <- i
-		i++
-		time.Sleep(time.Millisecond)
+		select {
+		case <-ctx.Done():
+			close(ch)
+			break
+		default:
+			ch <- i
+			i++
+			continue
+		}
+		break
 	}
 }

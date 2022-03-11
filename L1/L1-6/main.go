@@ -28,6 +28,16 @@ func main() {
 		ch <- struct{}{}
 	}
 	time.Sleep(time.Millisecond * 100)
+
+	//bonus:
+	go foo()
+}
+
+func foo() {
+	for {
+		i := 0
+		i++
+	}
 }
 
 func contextCancel(c context.Context) {

@@ -12,9 +12,9 @@ func (b Bank) payAbility(name string, price float64) bool {
 			continue
 		}
 		if card.Balance < price {
-			card.Balance -= price
 			return false
 		}
+		card.Balance -= price
 	}
 	return true
 }

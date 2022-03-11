@@ -1,15 +1,8 @@
 package main
 
 import (
-	"Work/L2/pattern/builder/model"
+	"builder/model"
 )
-
-/*
-+:
-Пошаговое создание чего-либо (из составляющих частей)
-Код не повторяется
-Все под интерфейсом
-*/
 
 func main() {
 	asusCollector := model.GetCollector("ASUS")

@@ -7,9 +7,8 @@ import (
 
 type cache struct {
 	cache map[int][]model.Event
+	m     sync.Mutex
 }
-
-var m sync.Mutex
 
 //NewCache - create new Cache interface reference
 func NewCache() Cache {
@@ -19,27 +18,27 @@ func NewCache() Cache {
 
 //Set - set value to cache (map)
 func (c *cache) Set(uuid int, event model.Event) {
-	m.Lock()
+	c.m.Lock()
 	events := c.cache[uuid]
 	for i, e := range events {
 		if e.ID == event.ID {
 			e = event
 			events[i] = e
-			m.Unlock()
+			c.m.Unlock()
 			return
 		}
 	}
 	c.cache[uuid] = append(c.cache[uuid], event)
-	m.Unlock()
+	c.m.Unlock()
 }
 
 //Get - get value from cache (map)
-func (c cache) Get(uuid int) []model.Event {
+func (c *cache) Get(uuid int) []model.Event {
 	return c.cache[uuid]
 }
 
 func (c *cache) Delete(uuid int, eventID int) {
-	m.Lock()
+	c.m.Lock()
 	events := c.cache[uuid]
 	for i, event := range events {
 		if event.ID == eventID {
@@ -48,7 +47,7 @@ func (c *cache) Delete(uuid int, eventID int) {
 		}
 	}
 	c.cache[uuid] = events
-	m.Unlock()
+	c.m.Unlock()
 }
 
 func remove(slice []model.Event, s int) []model.Event {
