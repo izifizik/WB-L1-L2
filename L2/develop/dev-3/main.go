@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"flag"
+	"dev-3/config"
 	"fmt"
 	"log"
 	"os"
@@ -23,37 +23,14 @@ func (s sortString) Len() int {
 	return len(s)
 }
 
-func usage() {
-	fmt.Println("Usage: [-k указание колонки для сортировки] [-n сортировать по числовому значению] " +
-		"[-r сортировать в обратном порядке] [-u не выводить повторяющиеся строки]")
-	os.Exit(0)
-}
-
-func main() {
-	k := flag.Int("k", 0, "указание колонки для сортировки")
-	n := flag.Bool("n", false, "сортировать по числовому значению")
-	r := flag.Bool("r", false, "сортировать в обратном порядке")
-	u := flag.Bool("u", false, "не выводить повторяющиеся строки")
-
-	//M := flag.Bool("M", false, "сортировать по названию месяца")
-	//b := flag.Bool("b", false, "игнорировать хвостовые пробелы")
-	//c := flag.Bool("c", false, "проверять отсортированы ли данные")
-	//h := flag.Bool("h", false, "сортировать по числовому значению с учетом суффиксов")
-
-	flag.Parse()
-
-	args := flag.Args()
-	if len(args) != 1 {
-		usage()
-	}
-
-	file, err := os.Open(args[0])
+func getFile(filename string) ([]string, error) {
+	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatalln(err.Error())
+		return nil, err
 	}
 	defer file.Close()
 
-	text := make([]string, 0)
+	var text []string
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
@@ -62,26 +39,36 @@ func main() {
 
 	err = scanner.Err()
 	if err != nil {
+		return nil, err
+	}
+	return text, nil
+}
+
+func main() {
+	cfg := config.NewConfig()
+
+	text, err := getFile(cfg.Filename)
+	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
 	fmt.Println("before:", text)
-	fmt.Println("after :", task(text, *k-1, *n, *r, *u))
+	fmt.Println("after :", task(text, cfg))
 }
 
 //task return sorted slice string
-func task(arr []string, k int, n, r, u bool) []string {
+func task(arr []string, cfg config.Config) []string {
 	//if M {
 	//	return month(arr)
 	//}
 	// конкретная строка для действа если в диапазоне строк в файле иначе все строки
-	if k >= 0 && k < len(arr) {
-		split := strings.Split(arr[k], " ")
+	if cfg.K >= 0 && cfg.K < len(arr) {
+		split := strings.Split(arr[cfg.K], " ")
 		v := ""
 		for _, s := range split {
-			v += flagCheck(s, n, r)
+			v += flagCheck(s, cfg.N, cfg.R)
 		}
-		arr[k] = v
+		arr[cfg.K] = v
 		return arr
 	}
 
@@ -89,7 +76,7 @@ func task(arr []string, k int, n, r, u bool) []string {
 	for _, str := range arr {
 		split := strings.Split(str, " ")
 		for _, s := range split {
-			st := flagCheck(s, n, r)
+			st := flagCheck(s, cfg.N, cfg.R)
 			if st == "" {
 				continue
 			}
@@ -97,7 +84,7 @@ func task(arr []string, k int, n, r, u bool) []string {
 		}
 	}
 
-	if u {
+	if cfg.U {
 		return checkUnique(res)
 	}
 
@@ -161,19 +148,3 @@ func Sort(str sortString) string {
 	sort.Sort(str)
 	return string(str)
 }
-
-//func isNum(arr []string) bool {
-//	str := arr[0]
-//	r := str[0]
-//	if r > '0' && r < '9' {
-//		return false
-//	}
-//	return true
-//}
-//func month(arr []string) []string {
-//	ok := isNum(arr)
-//	if ok {
-//		sort.Strings(arr)
-//	}
-//	return arr
-//}

@@ -2,6 +2,11 @@ package main
 
 import "chain-of-responsibility/chain"
 
+/*
+Цепочка дает прохождение определенных данных через цепочку обязательных действий логики
+(либо множество несвязанных действий, но цепочка-то есть)
+*/
+
 func main() {
 	device := &chain.Device{
 		Name: "Device-1",

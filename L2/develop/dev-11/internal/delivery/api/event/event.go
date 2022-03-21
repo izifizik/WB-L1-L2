@@ -107,6 +107,7 @@ func (h handler) EventsForDay(w http.ResponseWriter, r *http.Request) error {
 		params := r.URL.Query()
 		date := params.Get("date")
 		uuid := params.Get("user_id")
+
 		t, err := h.service.IsValid(date)
 		if err != nil {
 			return err

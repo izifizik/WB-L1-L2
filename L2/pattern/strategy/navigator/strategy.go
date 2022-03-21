@@ -6,6 +6,8 @@ type Strategy interface {
 	Route(start, stop int)
 }
 
+/*------------------------------------------------------*/
+
 type CarStrategy struct {
 }
 
@@ -17,6 +19,8 @@ func (s CarStrategy) Route(start, stop int) {
 	fmt.Printf("Strategy: Car, Total: %d, Time: %dm\n", total, time)
 }
 
+/*------------------------------------------------------*/
+
 type SubwayStrategy struct {
 }
 
@@ -27,6 +31,8 @@ func (s SubwayStrategy) Route(start, stop int) {
 	time := (avgSpeed*5*total + waitTime) / 100
 	fmt.Printf("Strategy: Subway, Total: %d, Time: %dm\n", total, time)
 }
+
+/*------------------------------------------------------*/
 
 type WalkStrategy struct {
 }

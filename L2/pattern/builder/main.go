@@ -4,6 +4,10 @@ import (
 	"builder/model"
 )
 
+/*
+Строитель дает инкапсуляцию создания объекта
+*/
+
 func main() {
 	asusCollector := model.GetCollector("ASUS")
 	hpCollector := model.GetCollector("HP")

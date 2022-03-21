@@ -21,6 +21,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	m := make(chan int)
 	wg := &sync.WaitGroup{}
+	wg.Add(1)
 	for i := 0; i < c; i++ {
 		wg.Add(1)
 		go worker(m, wg, i)

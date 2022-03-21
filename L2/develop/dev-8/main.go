@@ -3,45 +3,76 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
 )
 
+func usage() {
+	fmt.Fprintf(os.Stdout, "cd command must been using with ls or befor\\after pwd for proof of work\n")
+}
+
 func main() {
+	usage()
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Enter command: ")
 		if scanner.Scan() {
 			line := scanner.Text()
 
-			if line == `\q` {
-				break
-			}
-
 			commands := strings.Split(line, " | ")
 
-			err := CommandsExec(commands)
+			CommandsExec(commands)
+		}
+	}
+}
+
+func CommandsExec(commands []string) {
+	for _, command := range commands {
+		args := strings.Split(command, " ")
+		switch args[0] {
+		case "cd":
+			if len(args) < 2 {
+				fmt.Fprintf(os.Stderr, "path required")
+				continue
+			}
+			os.Chdir(args[1])
+
+		case "echo":
+			if len(args) < 2 {
+				fmt.Fprintf(os.Stdout, "")
+				continue
+			}
+			for i := 1; i < len(args)-1; i++ {
+				fmt.Fprintf(os.Stdout, args[i]+" ")
+			}
+		case "kill":
+			if len(args) < 2 {
+				fmt.Fprintf(os.Stdout, "need pid")
+				continue
+			}
+			cmd := exec.Command(args[0], args[1])
+
+			cmd.Stderr = os.Stderr
+			cmd.Stdout = os.Stdout
+
+			err := cmd.Run()
 			if err != nil {
-				log.Println("error to run command: ", err.Error())
+				fmt.Fprintln(os.Stderr, err)
+			}
+		case `\q`:
+			fmt.Fprintf(os.Stdout, "Bye!")
+			os.Exit(1)
+		default:
+			cmd := exec.Command(command)
+
+			cmd.Stderr = os.Stderr
+			cmd.Stdout = os.Stdout
+
+			err := cmd.Run()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
 			}
 		}
 	}
-
-	fmt.Println("Bye!")
-
-}
-
-func CommandsExec(commands []string) error {
-	for _, command := range commands {
-		out, err := exec.Command(command).Output()
-		if err != nil {
-			return fmt.Errorf("%s, %s", command, err.Error())
-		}
-
-		output := string(out[:])
-		fmt.Println(output)
-	}
-	return nil
 }

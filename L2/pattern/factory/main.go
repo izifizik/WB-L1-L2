@@ -6,8 +6,16 @@ import (
 	"log"
 )
 
+/*
+Фабрика дает легкость взаимодействия с интерфейсом
+Все что нужно вызвать нужный конструктор и все сделается за тебя
+*/
+
 func main() {
 	server := model.New(model.ServerType)
+	if server == nil {
+		log.Fatal()
+	}
 	fmt.Println(server.GetType())
 	server.Print()
 
@@ -16,6 +24,9 @@ func main() {
 	pc.Print()
 
 	laptop := model.New(model.Laptop)
+	if laptop == nil {
+		log.Fatal()
+	}
 	fmt.Println(laptop.GetType())
 	laptop.Print()
 
